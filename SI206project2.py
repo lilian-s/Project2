@@ -23,13 +23,17 @@ from bs4 import BeautifulSoup
 
 ## For example: 
 ## find_urls("http://www.google.com is a great site") should return ["http://www.google.com"]
-## find_urls("I love looking at websites like http://etsy.com and http://instagram.com and stuff") should return ["http://etsy.com","http://instagram.com"]
+## find_urls("I love looking at websites like http://etsy.com and http://instagram.com and stuff")
+## should return ["http://etsy.com","http://instagram.com"]
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
 def find_urls(s):
-    pass
-    #Your code here
-
+    list_urls = []
+    for x in s.split():
+        if '.co' in x:
+            if ('http' or 'www.') in x:
+                list_urls.append(x)
+    return list_urls
 
 
 ## PART 2  - Define a function grab_headlines.
