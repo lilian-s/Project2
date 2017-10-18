@@ -13,6 +13,8 @@
 import unittest
 import requests
 import re
+from urllib.request import urlopen
+import ssl
 from bs4 import BeautifulSoup
 
 
@@ -41,9 +43,21 @@ def find_urls(s):
 ## Grab the headlines from the "Most Read" section of 
 ## http://www.michigandaily.com/section/opinion
 
+
 def grab_headlines():
-    pass
-    #Your code here
+    # Ignore SSL certificate errors
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    
+    url = 'http://www.michigandaily.com/section/opinion'
+    html = urlopen(url, context=ctx).read()
+    soup = BeautifulSoup(html, "html.parser")
+    tags = soup('a')
+    for tag in tags:
+        #print(tag)
+        print(tag.get('href', None))
+    return None
 
 
 
