@@ -121,9 +121,6 @@ def num_students(data):
 
     return count
 
-
-
-
 ########### TESTS; DO NOT CHANGE ANY CODE BELOW THIS LINE! ###########
 def test(got, expected, pts):
     score = 0;
