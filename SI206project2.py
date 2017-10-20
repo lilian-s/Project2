@@ -17,6 +17,10 @@ from urllib.request import urlopen
 import ssl
 from bs4 import BeautifulSoup
 
+# Ignore SSL certificate errors
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
 ## Part 1 -- Define your find_urls function here.
 ## INPUT: any string
@@ -51,16 +55,11 @@ def find_urls(s):
 
 
 def grab_headlines():
-    # Ignore SSL certificate errors
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    
     url = 'http://www.michigandaily.com/section/opinion'
     html = urlopen(url, context=ctx).read()
     soup = BeautifulSoup(html, "lxml")
     tag_li = soup.find_all('li')
-    
+
     # to capture Most Read section
     list1 = []
     for line in tag_li:
@@ -89,8 +88,25 @@ def grab_headlines():
 
 def get_umsi_data():
     base_url = 'https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastna me_value=&rid=All'
-    requests.get(base_url, headers={'User-Agent': 'SI_CLASS'}) 
     umsi_titles = {}
+
+    # list of url for the pages 
+    url_list = []
+    for i in range(13):
+        if i == 0:
+            url_list.append(base_url)
+        else:
+            temp_url = base_url + '&page=' + str(i)
+            url_list.append(temp_url)
+    
+    for x in url_list:
+        r = requests.get(x, headers={'User-Agent': 'SI_CLASS'})
+    
+        soup = BeautifulSoup(r.text, 'html.parser')
+        names = soup.find_all('div', {'class': 'field-item even'}, property='dc:title')
+        titles = soup.find_all('div', {'class': 'field field-name-field-person-titles field-type-text field-label-hidden'})
+        for name, title in zip(names, titles):
+            umsi_titles[name.get_text().strip()] = title.get_text()
 
     return umsi_titles
 
@@ -98,8 +114,12 @@ def get_umsi_data():
 ## INPUT: The dictionary from get_umsi_data().
 ## OUTPUT: Return number of PhD students in the data.  (Don't forget, I may change the input data)
 def num_students(data):
-    pass
-    #Your code here
+    count = 0
+    for x in data:
+        if 'PhD student' in data[x]:
+            count += 1
+
+    return count
 
 
 
